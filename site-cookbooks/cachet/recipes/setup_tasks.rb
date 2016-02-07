@@ -18,5 +18,5 @@ end
 cron "setup_cachet_on_init" do
   action :create
   time :reboot
-  command "/opt/chef/bin/chef-apply /opt/lw1/tasks/first_boot.rb"
+  command "/opt/chef/bin/chef-apply /opt/lw1/tasks/first_boot.rb > /dev/null 2>&1"
 end

@@ -16,6 +16,27 @@ end
 cachet_location = adjust_location
 cachet_ver = "<%= node[:lw1_cachet][:install][:version] %>"
 
+if node[:memory][:total].to_i < 2097152
+  ruby_block "create swapfile" do
+    block do
+      unless ::File.exist?('/swapfile')
+        Chef::Log.info "Create Swapfile"
+        system('dd if=/dev/zero of=/swapfile bs=1024 count=2097152 && mkswap /swapfile')
+        system('swapon /swapfile')
+      end
+    end
+  end
+
+  mount 'swapfile1' do
+    action :enable
+    mount_point 'none'
+    pass 0
+    device '/swapfile'
+    fstype 'swap'
+    only_if { ::File.exists?('/swapfile') }
+  end
+end
+
 %w[userdir.conf welcome.conf autoindex.conf].map do |conf|
   file "/etc/httpd/conf.d/#{conf}" do
     action :delete
@@ -43,7 +64,6 @@ end
 
 package 'mod24_ssl'
 
-
 template "/etc/php.d/date.ini" do
   local true
   source "/opt/lw1/tasks/date.ini.erb"
@@ -63,8 +83,10 @@ bash 'install and setup cachet' do
   user "apache"
   group "apache"
   code <<-"EOH"
+    /usr/local/bin/composer install --no-dev -o
     /usr/bin/php artisan key:generate
     /usr/bin/php artisan app:install
+    /usr/local/bin/composer install --no-dev -o
     touch /var/www/Cachet/.htsetup_done
   EOH
   action :run
@@ -73,10 +95,6 @@ end
 
 
 service 'httpd' do
-  action [:enable, :start]
-end
-
-service 'postfix' do
   action [:enable, :start]
 end
 

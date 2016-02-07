@@ -28,6 +28,7 @@ bash "execute composer install" do
   code <<-EOL
      # /usr/local/bin/composer install --no-dev
      /usr/local/bin/composer install --no-dev -o
+     /usr/bin/php artisan config:clear
   EOL
   returns [0, 1]
 end
