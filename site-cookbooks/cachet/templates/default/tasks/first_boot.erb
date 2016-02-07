@@ -1,0 +1,85 @@
+require 'base64'
+
+def adjust_location
+  location = {}
+  case node.ec2.placement_availability_zone
+  when /^ap-northeast/
+    location[:lang] = "ja"
+    location[:zone] = "Asia/Tokyo"
+  else
+    location[:lang] = "en"
+    location[:zone] = "UTC"
+  end
+  location
+end
+
+cachet_location = adjust_location
+cachet_ver = "<%= node[:lw1_cachet][:install][:version] %>"
+
+%w[userdir.conf welcome.conf autoindex.conf].map do |conf|
+  file "/etc/httpd/conf.d/#{conf}" do
+    action :delete
+  end
+end
+
+service 'mysqld' do
+  action [:enable, :start]
+end
+
+bash 'mysql_secure_install emulate' do
+  code <<-"EOH"
+    /usr/bin/mysqladmin drop test -f
+    /usr/bin/mysql -e "create database cachet;" -D mysql
+    /usr/bin/mysql -e "DELETE FROM user WHERE user = '';" -D mysql
+    /usr/bin/mysql -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');" -D mysql
+    /usr/bin/mysql -e "SET PASSWORD FOR 'root'@'::1' = PASSWORD('#{node.ec2.instance_id}');" -D mysql
+    /usr/bin/mysql -e "SET PASSWORD FOR 'root'@'127.0.0.1' = PASSWORD('#{node.ec2.instance_id}');" -D mysql
+    /usr/bin/mysql -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('#{node.ec2.instance_id}');" -D mysql
+    /usr/bin/mysqladmin flush-privileges -pnewpassword -p#{node.ec2.instance_id}
+  EOH
+  action :run
+  only_if "/usr/bin/mysql -u root -e 'show databases;'"
+end
+
+package 'mod24_ssl'
+
+
+template "/etc/php.d/date.ini" do
+  local true
+  source "/opt/lw1/tasks/date.ini.erb"
+  variables cachet_location
+end
+
+template "/var/www/Cachet/.env" do
+  local true
+  mode  '0600'
+  owner "apache"
+  group "apache"
+  source "/opt/lw1/tasks/env.example.erb"
+end
+
+bash 'install and setup cachet' do
+  cwd "/var/www/Cachet"
+  user "apache"
+  group "apache"
+  code <<-"EOH"
+    /usr/bin/php artisan key:generate
+    /usr/bin/php artisan app:install
+    touch /var/www/Cachet/.htsetup_done
+  EOH
+  action :run
+  creates "/var/www/Cachet/.htsetup_done"
+end
+
+
+service 'httpd' do
+  action [:enable, :start]
+end
+
+service 'postfix' do
+  action [:enable, :start]
+end
+
+cron "setup_cachet_on_init" do
+  action :delete
+end

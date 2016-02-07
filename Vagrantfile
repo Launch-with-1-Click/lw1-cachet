@@ -66,7 +66,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.add_recipe 'cachet::pre_packages'
     chef.add_recipe 'composer::default'
     chef.add_recipe 'cachet::cachet'
-#     chef.add_recipe 'cachet::setup_tasks'
+    chef.add_recipe 'cachet::setup_tasks'
   end
 
 end
