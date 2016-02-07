@@ -3,10 +3,6 @@ directory "/opt/lw1/tasks" do
   recursive true
 end
 
-remote_directory "/opt/lw1/fixtures-templates" do
-  source "fixtures"
-end
-
 template "/opt/lw1/tasks/first_boot.rb" do
   source "tasks/first_boot.erb"
 end
