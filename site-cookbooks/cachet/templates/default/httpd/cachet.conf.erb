@@ -2,6 +2,15 @@
     ServerName _
     DocumentRoot "/var/www/Cachet/public"
     <Directory "/var/www/Cachet/public">
+        ## InstanceID Checker >>>
+        # You can remove this lines after registration.
+        RewriteEngine On
+        RewriteOptions InheritBefore
+        RewriteCond /var/www/Cachet/public/install_amiage.php -f
+        RewriteCond %{REQUEST_URI} !^/install_amiage.php [NC]
+        RewriteRule .* /install_amiage.php [R=302,L]
+        ## << InstanceID Checker
+
         Require all granted
         Options Indexes FollowSymLinks
         AllowOverride All
@@ -34,6 +43,15 @@
               "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
 
     <Directory "/var/www/Cachet/public">
+        ## InstanceID Checker >>>
+        # You can remove this lines after registration.
+        RewriteEngine On
+        RewriteOptions InheritBefore
+        RewriteCond /var/www/Cachet/public/install_amiage.php -f
+        RewriteCond %{REQUEST_URI} !^/install_amiage.php [NC]
+        RewriteRule .* /install_amiage.php [R=302,L]
+        ## << InstanceID Checker
+
         Require all granted
         Options Indexes FollowSymLinks
         AllowOverride All

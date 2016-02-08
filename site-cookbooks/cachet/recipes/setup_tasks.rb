@@ -15,6 +15,10 @@ cookbook_file "/opt/lw1/tasks/env.example.erb" do
   source "lw1_tasks/env.example.erb"
 end
 
+cookbook_file "/opt/lw1/tasks/install_amiage.php.erb" do
+  source "lw1_tasks/install_amiage.php.erb"
+end
+
 cron "setup_cachet_on_init" do
   action :create
   time :reboot
