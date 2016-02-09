@@ -1,12 +1,11 @@
-ark "Cachet" do
-  url node[:lw1_cachet][:install][:download_url]
-  version node[:lw1_cachet][:install][:version]
-  path "/var/www"
-  checksum  node[:lw1_cachet][:install][:checksum]
-  owner 'apache'
-  group 'apache'
-  action :put
+git "/var/www/Cachet" do
+  repository node[:lw1_cachet][:install][:repo_url]
+  revision node[:lw1_cachet][:install][:version]
+  action :checkout
+  user  node[:lw1_cachet][:user]
+  group node[:lw1_cachet][:group]
 end
+
 
 template "/etc/httpd/conf/httpd.conf" do
   source "httpd/httpd.conf.erb"

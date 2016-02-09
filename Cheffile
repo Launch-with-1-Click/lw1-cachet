@@ -3,7 +3,6 @@
 
 site 'http://community.opscode.com/api/v1'
 
-cookbook 'ark'
 cookbook "composer",
   :git => "git://github.com/Morphodo/chef-composer.git"
 
