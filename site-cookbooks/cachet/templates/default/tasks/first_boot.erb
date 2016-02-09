@@ -77,7 +77,7 @@ template "/var/www/Cachet/public/install_amiage.php" do
   group "apache"
   source "/opt/lw1/tasks/install_amiage.php.erb"
   variables ({
-    instance_id => node[:ec2][:instance_id]
+    :instance_id => node[:ec2][:instance_id]
   })
 end
 
