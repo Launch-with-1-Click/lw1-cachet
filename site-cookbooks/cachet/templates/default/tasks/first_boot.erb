@@ -104,6 +104,9 @@ bash 'install and setup cachet' do
   creates "/var/www/Cachet/.htsetup_done"
 end
 
+service 'postfix' do
+  action [:enable, :start]
+end
 
 service 'httpd' do
   action [:enable, :start]
