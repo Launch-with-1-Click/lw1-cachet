@@ -87,6 +87,7 @@ template "/var/www/Cachet/.env" do
   owner "apache"
   group "apache"
   source "/opt/lw1/tasks/env.example.erb"
+  variables node
 end
 
 bash 'install and setup cachet' do
