@@ -8,7 +8,7 @@ end
 ## apache cannot create dir under /var/www directly.
 bash "fixup_Cachet_permissions_after_clone" do
   code <<-EOL
-  chown -r #{node[:lw1_cachet][:user]}.#{node[:lw1_cachet][:group]} /var/www/Cachet
+  chown -R #{node[:lw1_cachet][:user]}.#{node[:lw1_cachet][:group]} /var/www/Cachet
   EOL
   action :nothing
 end
